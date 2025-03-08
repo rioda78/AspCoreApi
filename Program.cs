@@ -1,7 +1,8 @@
-
+using System.Threading.RateLimiting;
 using AspCoreApi.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Plainquire.Filter.Mvc;
@@ -18,6 +19,14 @@ namespace AspCoreApi
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddRateLimiter(_ => _
+                .AddFixedWindowLimiter(policyName: "fixed", options =>
+                {
+                    options.PermitLimit = 4;
+                    options.Window = TimeSpan.FromSeconds(12);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 2;
+                }));
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer(); // Required for minimal APIs
@@ -38,15 +47,15 @@ namespace AspCoreApi
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
-        }
-    });
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
             });
             var koneksi = builder.Configuration.GetConnectionString("FbKoneksi");
             builder.Services.AddDbContext<ApplicationDbContext>(
@@ -54,11 +63,8 @@ namespace AspCoreApi
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            builder.Services.Configure<IdentityOptions>(options =>
-            {
-                options.SignIn.RequireConfirmedEmail = false;
-            });
-            
+            builder.Services.Configure<IdentityOptions>(options => { options.SignIn.RequireConfirmedEmail = false; });
+
             builder.Services.AddControllers().AddFilterSupport();
             builder.Services.AddSwaggerGen(options => options.AddFilterSupport());
             //   builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -77,11 +83,10 @@ namespace AspCoreApi
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api BoilerPlate V1");
                     c.RoutePrefix = string.Empty; // Set Swagger UI at the root URL (optional)
-               
                 });
-
             }
 
+            app.UseRateLimiter();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
@@ -89,7 +94,7 @@ namespace AspCoreApi
             app.UseAuthorization();
 
             app.MapGroup("/api")
-               .MapIdentityApi<IdentityUser>().RequireAuthorization();
+                .MapIdentityApi<IdentityUser>().RequireAuthorization();
             //  app.MapSwagger().RequireAuthorization();
             app.MapControllers();
 
