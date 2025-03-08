@@ -27,6 +27,7 @@
     <PackageReference Include="Plainquire.Filter" Version="6.3.0" />
     <PackageReference Include="Plainquire.Filter.Mvc" Version="6.3.0" />
     <PackageReference Include="Plainquire.Filter.Swashbuckle" Version="6.3.0" />
+    <PackageReference Include="Plainquire.Sort" Version="6.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.1" />
