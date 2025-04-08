@@ -19,7 +19,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResult<User>>> GetUsers([FromQuery] UserFilter filter)
+    public async Task<ActionResult<PagedResult<ApplicationUser>>> GetUsers([FromQuery] UserFilter filter)
     {
         var query = _context.Users.AsQueryable();
 
@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
 
 
         // Wrap result
-        var result = new PagedResult<User>
+        var result = new PagedResult<ApplicationUser>
         {
             Items = paged.ToList(),
             PageNumber = paged.PageNumber,

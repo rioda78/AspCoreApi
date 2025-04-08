@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspCoreApi.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace AspCoreApi.Seeder.Identity;
 
@@ -6,23 +7,29 @@ public static class IdentitySeeder
 {
     public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
     {
-        // Seed roles
-        string[] roleNames = { "Admin", "User", "Manager" };
+    
+        var roles = new[]
+    {
+        new IdentityRole("Admin"),
+        new IdentityRole("User"),
+        new IdentityRole("Manager")
+    };
 
-        foreach (var roleName in roleNames)
+
+        foreach (var role in roles)
         {
-            var roleExist = await roleManager.RoleExistsAsync(roleName);
+            var roleExist = await roleManager.RoleExistsAsync(role.Name);
             if (!roleExist)
             {
-                await roleManager.CreateAsync(new IdentityRole(roleName));
+                await roleManager.CreateAsync(role);
             }
         }
     }
 
-    public static async Task SeedAdminUserAsync(UserManager<IdentityUser> userManager)
+    public static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
     {
         // Seed admin user
-        var adminUser = new IdentityUser
+        var adminUser = new ApplicationUser
         {
             UserName = "admin@example.com",
             Email = "admin@example.com",

@@ -1,5 +1,7 @@
 using System.Threading.RateLimiting;
 using AspCoreApi.Data;
+using AspCoreApi.Ekstensi;
+using AspCoreApi.Models;
 using AspCoreApi.Seeder.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -31,15 +33,18 @@ public class Program
             // Add services to the container
             ConfigureServices(builder);
 
-            var app = builder.Build();
+         
+             var app = builder.Build();
+                                           
+                ConfigureMiddleware(app);
 
-            // Configure the HTTP request pipeline
-            ConfigureMiddleware(app);
+                // Seed the database
+                await SeedDatabase(app);
 
-            // Seed the database
-            await SeedDatabase(app);
+                app.Run();
+        
 
-            app.Run();
+          
         }
         catch (Exception ex)
         {
@@ -278,7 +283,7 @@ public class Program
     private static void ConfigureIdentity(WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityApiEndpoints<IdentityUser>()
+            .AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -297,11 +302,14 @@ public class Program
 
             // User settings
             options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedAccount = false;
             options.SignIn.RequireConfirmedEmail = false;
         });
 
         // Add auditing for identity operations
         builder.Services.AddScoped<IAuditableIdentityContext, AuditableIdentityContext>();
+        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, DummyEmailSender<ApplicationUser>>();
+
     }
 
     private static void ConfigureMiddleware(WebApplication app)
@@ -354,7 +362,7 @@ public class Program
 
         // Map endpoints
         app.MapGroup("/api")
-            .MapIdentityApi<IdentityUser>()
+            .MapIdentityApi<ApplicationUser>()
             .RequireAuthorization();
 
         app.MapControllers();
@@ -375,7 +383,7 @@ public class Program
             await dbContext.Database.MigrateAsync();
 
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
             Log.Information("Seeding roles");
             await IdentitySeeder.SeedRolesAsync(roleManager);

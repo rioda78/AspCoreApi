@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AspCoreApi.Models;
 
-public class User : IdentityUser<int>, IEntity
+public class ApplicationUser : IdentityUser, IEntity
 {
-    public User()
+    public ApplicationUser()
     {
         IsActive = true;
     }
@@ -23,9 +23,9 @@ public class User : IdentityUser<int>, IEntity
    // public ICollection<Post> Posts { get; set; }
 }
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.Property(p => p.UserName).IsRequired().HasMaxLength(100);
     }
