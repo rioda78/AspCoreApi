@@ -16,7 +16,6 @@ public static class IdentityConfiguration
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddDefaultUI();
-        
 
 
         // Add services for auditing identity operations
