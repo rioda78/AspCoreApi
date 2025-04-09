@@ -33,6 +33,7 @@ public static class IdentitySeeder
         {
             UserName = "admin@example.com",
             Email = "admin@example.com",
+            FullName = "Admin",
         };
 
         string adminPassword = "Admin@123";
