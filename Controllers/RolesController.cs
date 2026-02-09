@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspCoreApi.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
 public class RolesController : ControllerBase
@@ -15,7 +16,9 @@ public class RolesController : ControllerBase
         _roleManager = roleManager;
     }
 
+    // 1. Gabungkan GetAllRoles dan GetRoles menjadi satu
     [HttpGet]
+    [ProducesResponseType(typeof(BaseResponse<List<IdentityRole>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<BaseResponse<List<IdentityRole>>>> GetAllRoles()
     {
         var roles = _roleManager.Roles.ToList();
@@ -31,8 +34,8 @@ public class RolesController : ControllerBase
 
         return Ok(BaseResponse<IdentityRole>.SuccessResponse(role));
     }
-    
 
+    // 2. Gunakan rute yang jelas untuk pembaruan berdasarkan ID
     [HttpPut("{id}")]
     public async Task<ActionResult<BaseResponse<string>>> UpdateRole(string id, [FromBody] string newName)
     {
@@ -50,14 +53,6 @@ public class RolesController : ControllerBase
         }
 
         return Ok(BaseResponse<string>.SuccessResponse("Role updated successfully."));
-    }
-    
-    [HttpGet]
-    [ProducesResponseType(typeof(BaseResponse<List<IdentityRole>>), StatusCodes.Status200OK)]
-    public ActionResult<BaseResponse<List<IdentityRole>>> GetRoles()
-    {
-        var roles = _roleManager.Roles.ToList();
-        return Ok(BaseResponse<List<IdentityRole>>.SuccessResponse(roles));
     }
 
     [HttpPost]
@@ -89,7 +84,8 @@ public class RolesController : ControllerBase
         return Ok(BaseResponse<string>.SuccessResponse("Role deleted successfully."));
     }
 
-    [HttpPut]
+    // 3. Tambahkan sub-route "rename" agar tidak bentrok dengan Put berdasarkan ID
+    [HttpPut("rename")]
     [ProducesResponseType(typeof(BaseResponse<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<BaseResponse<string>>> RenameRole([FromQuery] string currentName, [FromQuery] string newName)
     {

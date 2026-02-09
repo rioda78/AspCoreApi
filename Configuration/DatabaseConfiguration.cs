@@ -17,8 +17,13 @@ public static class DatabaseConfiguration
 
         switch (databaseType)
         {
+            /*
             case "mysql":
                 ConfigureMySqlDatabase(services, configuration, environment);
+                break;
+            */
+            case "pgsql":
+                ConfigurePgsqlDatabase(services, configuration, environment);
                 break;
             case "firebird":
                 ConfigureFirebirdDatabase(services, configuration, environment);
@@ -30,7 +35,7 @@ public static class DatabaseConfiguration
 
         return services;
     }
-
+    /*
     private static void ConfigureMySqlDatabase(
         IServiceCollection services,
         IConfiguration configuration,
@@ -68,7 +73,47 @@ public static class DatabaseConfiguration
                     (message) => Log.Logger.Information(message.ToString()))
         );
     }
+    */
 
+    private static void ConfigurePgsqlDatabase(IServiceCollection services,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
+    {
+        var connectionString = configuration.GetConnectionString("PostgreKoneksi");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            Log.Error("Postgresql connection string is not configured");
+            throw new InvalidOperationException("PostgreSql connection string is not configured.");
+        }
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+
+            // Hanya aktifkan logging detail di Development
+            if (environment.IsDevelopment())
+            {
+                options.EnableSensitiveDataLogging();
+                // Gunakan WriteLine atau biarkan Serilog menangkap via ILoggerFactory
+                options.LogTo(Console.WriteLine, LogLevel.Information);
+            }
+            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        });
+        /*
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options
+                .UseNpgsql(connectionString)
+
+        .EnableSensitiveDataLogging(environment.IsDevelopment())
+        .LogTo(
+            message => Log.Logger.Information(message),
+            LogLevel.Information,
+            DbContextLoggerOptions.DefaultWithUtcTime)
+
+        );
+        */
+
+    }
     private static void ConfigureFirebirdDatabase(
         IServiceCollection services,
         IConfiguration configuration,

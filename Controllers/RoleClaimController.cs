@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using AspCoreApi.Helpers;
+using AspCoreApi.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ public class RoleClaimsController : ControllerBase
     }
     
     [HttpPost("{role}/claims")]
+    [ProducesResponseType(typeof(BaseResponse<List<RoleClaimDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<BaseResponse<string>>> AddClaimToRole(string role, [FromQuery] string claimType, [FromQuery] string claimValue)
     {
         var identityRole = await _roleManager.FindByNameAsync(role);

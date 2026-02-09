@@ -46,8 +46,10 @@ public class Program
             // Configure middleware pipeline
             app.ConfigureApplicationPipeline(builder.Environment);
 
-            // Seed the database
-            await app.SeedDatabase();
+            // Pastikan seeding tidak menghentikan Build Migrasi
+    
+          //  await app.SeedDatabase();
+
 
             app.Run();
         }

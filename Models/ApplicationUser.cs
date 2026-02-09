@@ -9,7 +9,7 @@ public class ApplicationUser : IdentityUser, IEntity
 {
     public ApplicationUser()
     {
-        IsActive = true;
+        IsActive = false;
     }
         
     [Required]

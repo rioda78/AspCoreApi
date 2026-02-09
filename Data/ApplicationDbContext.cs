@@ -15,8 +15,11 @@ namespace AspCoreApi.Data
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.SeedIdentitas();
+        
             base.OnModelCreating(builder);
             var entitiesAssembly = typeof(IEntity).Assembly;
+            builder.ChangeTableNameAsp();
 
             builder.RegisterAllEntities<IEntity>(entitiesAssembly);
             builder.RegisterEntityTypeConfiguration(entitiesAssembly);

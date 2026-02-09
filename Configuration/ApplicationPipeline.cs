@@ -75,6 +75,7 @@ public static class ApplicationPipeline
         // Map endpoints
         app.MapGroup("/api/v1")
             .MapIdentityApi<ApplicationUser>()
+            .WithTags("Authentication")
             .RequireAuthorization();
 
         app.MapControllers();
